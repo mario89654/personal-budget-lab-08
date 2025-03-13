@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Presupuesto Personal</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+    <header class="bg-blue-600 text-white py-4 text-center text-2xl font-bold">
+        Gestor de Presupuesto Personal
+    </header>
+    
+    <main class="max-w-2xl mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
+        <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="bg-blue-100 p-4 rounded-md">
+                <h3 class="text-sm font-semibold">Balance</h3>
+                <p class="text-xl font-bold text-blue-600">$0.00</p>
+            </div>
+            <div class="bg-green-100 p-4 rounded-md">
+                <h3 class="text-sm font-semibold">Ingresos</h3>
+                <p class="text-xl font-bold text-green-600">$0.00</p>
+            </div>
+            <div class="bg-red-100 p-4 rounded-md">
+                <h3 class="text-sm font-semibold">Gastos</h3>
+                <p class="text-xl font-bold text-red-600">$0.00</p>
+            </div>
+        </div>
+
+        <h2 class="text-lg font-medium mt-6">Añadir nueva transacción</h2>
+        <form id="budget-form" class="space-y-4 mt-4">
+            <div>
+                <label for="description" class="block text-sm font-medium">Descripción</label>
+                <input type="text" id="description" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Descripción de la transacción" required>
+            </div>
+            <div>
+                <label for="amount" class="block text-sm font-medium">Monto ($)</label>
+                <input type="number" id="amount" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Monto (positivo para ingresos, negativo para gastos)" required>
+            </div>
+            <div class="flex items-center space-x-4">
+                <input type="radio" id="income" name="type" value="Ingreso" class="form-radio" checked>
+                <label for="income">Ingreso</label>
+                <input type="radio" id="expense" name="type" value="Gasto" class="form-radio">
+                <label for="expense">Gasto</label>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-700">Añadir Transacción</button>
+        </form>
+    </main>
+    
+    <section class="max-w-2xl mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-lg font-medium mb-4">Historial de transacciones</h2>
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b">
+                    <th class="p-2">Descripción</th>
+                    <th class="p-2">Monto</th>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="movements-list">
+                <tr>
+                    <td colspan="4" class="text-center p-4 text-gray-500">No hay transacciones registradas</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    
+    <footer class="text-center py-4 mt-6 text-sm text-gray-600">
+        Gestor de Presupuesto Personal © 2025
+    </footer>
+
+ <script src="./app.js"></script>
+    <script>
+        document.getElementById('budget-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const description = document.getElementById('description').value;
+            const amount = document.getElementById('amount').value;
+            const type = document.querySelector('input[name="type"]:checked').value;
+            
+            if (!amount || !description) return;
+            
+            const tableBody = document.getElementById('movements-list');
+            const row = document.createElement('tr');
+            row.className = 'border-b';
+            row.innerHTML = `
+                <td class="p-2">${description}</td>
+                <td class="p-2 ${type === 'Ingreso' ? 'text-green-600' : 'text-red-600'}">$${amount}</td>
+                <td class="p-2">${new Date().toLocaleDateString()}</td>
+                <td class="p-2"><button class="text-red-500 hover:text-red-700">Eliminar</button></td>
+            `;
+            
+            tableBody.appendChild(row);
+            document.getElementById('budget-form').reset();
+        });
+    </script>
+</body>
+</html>
