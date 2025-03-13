@@ -1,91 +1,123 @@
 const form = document.querySelector("form");
+const transactionList = document.querySelector("#transaction-list");
+const totalIncomeEl = document.querySelector("#total-income");
+const totalExpenseEl = document.querySelector("#total-expense");
+const confirmationMessage = document.querySelector("#confirmation-message");
+
 const transacciones = [];
-const balanceEl = document.querySelector("#balance");
-const ingresosEl = document.querySelector("#ingresos");
-const gastosEl = document.querySelector("#gastos");
-const movimientosList = document.querySelector("#movements-list");
 
 function getDataFromForm() {
-    const formData = new FormData(form);
-    return {
-        description: formData.get("description"),
-        amount: parseFloat(formData.get("amount").trim()),
-        type: formData.get("type")
-    };
-}
+  const formData = new FormData(form);
+  const description = formData.get("description");
+  const amount = Number(formData.get("amount"));
+  const type = formData.get("type");
 
-function Movimiento(tipo, monto, descripcion) {
-    this.tipo = tipo;
-    this.monto = monto;
-    this.descripcion = descripcion;
+  return {
+    description,
+    amount,
+    type,
+  };
 }
-
-Movimiento.prototype.validarMovimiento = function () {
-    console.log("Validando movimiento:", this.tipo, this.monto, this.descripcion);
-    
-    if (isNaN(this.monto) || this.monto <= 0) {
-        return { ok: false, message: "El monto debe ser un número mayor a 0" };
-    }
-    if (this.descripcion.trim() === "") {
-        return { ok: false, message: "Debe completar la descripción" };
-    }
-    if (!["Ingreso", "Gasto"].includes(this.tipo)) {
-        return { ok: false, message: "El tipo de transacción es erróneo" };
-    }
-    return { ok: true, message: "Movimiento validado correctamente" };
-};
 
 function createMovement(movement) {
-    const nuevoMovimiento = new Movimiento(movement.type, movement.amount, movement.description);
-    const validacion = nuevoMovimiento.validarMovimiento();
+  const nuevoMovimiento = movement.type === "income"
+    ? new Ingreso(movement.amount, movement.description)
+    : new Egreso(movement.amount, movement.description);
 
-    if (validacion.ok) {
-        transacciones.push(nuevoMovimiento);
-        updateUI();
-        form.reset();
-    } else {
-        alert(validacion.message);
-    }
-}
+  const validacion = nuevoMovimiento.validarMovimiento();
 
-function updateUI() {
-    let balance = 0, ingresos = 0, gastos = 0;
-    movimientosList.innerHTML = "";
-    
-    transacciones.forEach((mov) => {
-        const row = document.createElement("tr");
-        row.className = "border-b";
-        row.innerHTML = `
-            <td class="p-2">${mov.descripcion}</td>
-            <td class="p-2 ${mov.tipo === 'Ingreso' ? 'text-green-600' : 'text-red-600'}">$${mov.monto.toFixed(2)}</td>
-            <td class="p-2">${new Date().toLocaleDateString()}</td>
-            <td class="p-2">
-                <button class="text-red-500 hover:text-red-700" onclick="deleteMovement(${transacciones.indexOf(mov)})">Eliminar</button>
-            </td>
-        `;
-        movimientosList.appendChild(row);
-
-        if (mov.tipo === "Ingreso") {
-            ingresos += mov.monto;
-            balance += mov.monto;
-        } else {
-            gastos += mov.monto;
-            balance -= mov.monto;
-        }
-    });
-
-    balanceEl.textContent = `$${balance.toFixed(2)}`;
-    ingresosEl.textContent = `$${ingresos.toFixed(2)}`;
-    gastosEl.textContent = `$${gastos.toFixed(2)}`;
-}
-
-function deleteMovement(index) {
-    transacciones.splice(index, 1);
-    updateUI();
+  if (validacion.ok) {
+    transacciones.push(nuevoMovimiento);
+    nuevoMovimiento.render();
+    Movimiento.prototype.recalcularTotales();
+    showConfirmationMessage("Movimiento registrado correctamente");
+    form.reset();
+  } else {
+    alert(validacion.message);
+  }
 }
 
 form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    const newMovement = getDataFromForm();
-    createMovement(newMovement);
+  event.preventDefault();
+  const newMovement = getDataFromForm();
+  createMovement(newMovement);
 });
+
+function Movimiento(monto, descripcion) {
+  this.monto = monto;
+  this.descripcion = descripcion;
+  this.fecha = new Date().toLocaleDateString();
+}
+
+Movimiento.prototype.render = function () {
+  const esEgreso = this instanceof Egreso;
+  const colorTexto = esEgreso ? "text-red-600" : "text-green-600";
+  const colorFondo = esEgreso ? "bg-red-50" : "bg-green-50";
+  const signo = esEgreso ? "-" : "+";
+
+  const newRow = `
+    <tr class="hover:${colorFondo} ${colorFondo}/30 transition-colors duration-200">
+      <td class="px-4 py-3 font-medium">${this.descripcion}</td>
+      <td class="px-4 py-3 ${colorTexto} font-bold">${signo}$${Math.abs(
+    this.monto
+  ).toFixed(2)}</td>
+      <td class="px-4 py-3 text-gray-500">${this.fecha}</td>
+    </tr>
+  `;
+  transactionList.innerHTML += newRow;
+};
+
+Movimiento.prototype.recalcularTotales = function () {
+  let totalIngresos = 0;
+  let totalEgresos = 0;
+
+  transacciones.forEach((mov) => {
+    if (mov instanceof Ingreso) {
+      totalIngresos += mov.monto;
+    } else if (mov instanceof Egreso) {
+      totalEgresos += mov.monto;
+    }
+  });
+
+  totalIncomeEl.textContent = `$${totalIngresos.toFixed(2)}`;
+  totalExpenseEl.textContent = `$${totalEgresos.toFixed(2)}`;
+};
+
+Movimiento.prototype.validarMovimiento = function () {
+  if (this.monto <= 0 || isNaN(this.monto)) {
+    return {
+      ok: false,
+      message: "El monto debe ser un número mayor a 0",
+    };
+  }
+  if (!this.descripcion || this.descripcion.trim() === "") {
+    return {
+      ok: false,
+      message: "Debe completar la descripción",
+    };
+  }
+  return {
+    ok: true,
+    message: "Movimiento registrado correctamente",
+  };
+};
+
+function Ingreso(monto, descripcion) {
+  Movimiento.call(this, monto, descripcion);
+}
+Ingreso.prototype = Object.create(Movimiento.prototype);
+Ingreso.prototype.constructor = Ingreso;
+
+function Egreso(monto, descripcion) {
+  Movimiento.call(this, monto, descripcion);
+}
+Egreso.prototype = Object.create(Movimiento.prototype);
+Egreso.prototype.constructor = Egreso;
+
+function showConfirmationMessage(message) {
+  confirmationMessage.textContent = message;
+  confirmationMessage.classList.remove("hidden");
+  setTimeout(() => {
+    confirmationMessage.classList.add("hidden");
+  }, 3000);
+}

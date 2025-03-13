@@ -1,98 +1,165 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestor de Presupuesto Personal</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-</head>
-<body class="bg-gray-100 text-gray-900">
-    <header class="bg-blue-600 text-white py-4 text-center text-2xl font-bold">
-        Gestor de Presupuesto Personal
-    </header>
-    
-    <main class="max-w-2xl mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
-        <div class="grid grid-cols-3 gap-4 text-center">
-            <div class="bg-blue-100 p-4 rounded-md">
-                <h3 class="text-sm font-semibold">Balance</h3>
-                <p class="text-xl font-bold text-blue-600">$0.00</p>
+  </head>
+  <body class="bg-gray-100 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Cabecera -->
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800">
+          Gestor de Presupuesto Personal
+        </h1>
+        <div class="mt-4 p-4 bg-white rounded-lg shadow-md">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div class="p-3 rounded-lg bg-blue-50">
+              <h2 class="text-lg font-semibold text-gray-700">Balance</h2>
+              <p id="balance" class="text-2xl font-bold text-blue-600">$0.00</p>
             </div>
-            <div class="bg-green-100 p-4 rounded-md">
-                <h3 class="text-sm font-semibold">Ingresos</h3>
-                <p class="text-xl font-bold text-green-600">$0.00</p>
+            <div class="p-3 rounded-lg bg-green-50">
+              <h2 class="text-lg font-semibold text-gray-700">Ingresos</h2>
+              <p id="income" class="text-2xl font-bold text-green-600">$0.00</p>
             </div>
-            <div class="bg-red-100 p-4 rounded-md">
-                <h3 class="text-sm font-semibold">Gastos</h3>
-                <p class="text-xl font-bold text-red-600">$0.00</p>
+            <div class="p-3 rounded-lg bg-red-50">
+              <h2 class="text-lg font-semibold text-gray-700">Gastos</h2>
+              <p id="expense" class="text-2xl font-bold text-red-600">$0.00</p>
             </div>
+          </div>
         </div>
+      </header>
 
-        <h2 class="text-lg font-medium mt-6">Añadir nueva transacción</h2>
-        <form id="budget-form" class="space-y-4 mt-4">
+      <!-- Formulario para añadir transacciones -->
+      <section class="mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">
+            Añadir nueva transacción
+          </h2>
+          <form id="transaction-form" class="space-y-4">
             <div>
-                <label for="description" class="block text-sm font-medium">Descripción</label>
-                <input type="text" id="description" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Descripción de la transacción" required>
+              <label
+                for="description"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Descripción</label
+              >
+              <input
+                type="text"
+                id="description"
+                name="description"
+                placeholder="Descripción de la transacción"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
             <div>
-                <label for="amount" class="block text-sm font-medium">Monto ($)</label>
-                <input type="number" id="amount" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Monto (positivo para ingresos, negativo para gastos)" required>
+              <label
+                for="amount"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Monto ($)</label
+              >
+              <input
+                type="number"
+                id="amount"
+                name="amount"
+                placeholder="Monto (positivo para ingresos, negativo para gastos)"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-            <div class="flex items-center space-x-4">
-                <input type="radio" id="income" name="type" value="Ingreso" class="form-radio" checked>
-                <label for="income">Ingreso</label>
-                <input type="radio" id="expense" name="type" value="Gasto" class="form-radio">
-                <label for="expense">Gasto</label>
+            <div class="flex space-x-4">
+              <div class="flex items-center">
+                <input
+                  type="radio"
+                  id="type-income"
+                  name="type"
+                  value="income"
+                  checked
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                />
+                <label
+                  for="type-income"
+                  class="ml-2 block text-sm text-gray-700"
+                  >Ingreso</label
+                >
+              </div>
+              <div class="flex items-center">
+                <input
+                  type="radio"
+                  id="type-expense"
+                  name="type"
+                  value="expense"
+                  class="h-4 w-4 text-red-600 focus:ring-red-500"
+                />
+                <label
+                  for="type-expense"
+                  class="ml-2 block text-sm text-gray-700"
+                  >Gasto</label
+                >
+              </div>
             </div>
-            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-700">Añadir Transacción</button>
-        </form>
-    </main>
-    
-    <section class="max-w-2xl mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
-        <h2 class="text-lg font-medium mb-4">Historial de transacciones</h2>
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b">
-                    <th class="p-2">Descripción</th>
-                    <th class="p-2">Monto</th>
-                    <th class="p-2">Fecha</th>
-                    <th class="p-2">Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="movements-list">
-                <tr>
-                    <td colspan="4" class="text-center p-4 text-gray-500">No hay transacciones registradas</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-    
-    <footer class="text-center py-4 mt-6 text-sm text-gray-600">
-        Gestor de Presupuesto Personal © 2025
-    </footer>
+            <button
+              type="submit"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300"
+            >
+              Añadir Transacción
+            </button>
+          </form>
+        </div>
+      </section>
 
- <script src="./app.js"></script>
-    <script>
-        document.getElementById('budget-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const description = document.getElementById('description').value;
-            const amount = document.getElementById('amount').value;
-            const type = document.querySelector('input[name="type"]:checked').value;
-            
-            if (!amount || !description) return;
-            
-            const tableBody = document.getElementById('movements-list');
-            const row = document.createElement('tr');
-            row.className = 'border-b';
-            row.innerHTML = `
-                <td class="p-2">${description}</td>
-                <td class="p-2 ${type === 'Ingreso' ? 'text-green-600' : 'text-red-600'}">$${amount}</td>
-                <td class="p-2">${new Date().toLocaleDateString()}</td>
-                <td class="p-2"><button class="text-red-500 hover:text-red-700">Eliminar</button></td>
-            `;
-            
-            tableBody.appendChild(row);
-            document.getElementById('budget-form').reset();
-        });
-    </script>
-</body>
+      <!-- Lista de transacciones -->
+      <section>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">
+            Historial de transacciones
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="bg-gray-50 border-b">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Descripción
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Monto
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Fecha
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="transaction-list" class="divide-y divide-gray-200">
+                <!-- Aquí se cargarán las transacciones dinámicamente -->
+                <!-- <tr class="text-sm text-gray-500">
+                  <td colspan="4" class="px-6 py-4 text-center">
+                    No hay transacciones registradas
+                  </td>
+                </tr> -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pie de página -->
+      <footer class="mt-8 text-center text-gray-500 text-sm">
+        <p>Gestor de Presupuesto Personal © 2025</p>
+      </footer>
+    </div>
+    <!-- enlazando mi archivo JS con mi HTML -->
+    <script src="app.js"></script>
+  </body>
 </html>
